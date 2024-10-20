@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  app:
+    image: spring-image    # Spring Boot 애플리케이션의 Docker 이미지 이름
+    container_name: hr-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"          # 호스트의 8080번 포트와 컨테이너의 8080번 포트 매핑
+    environment:
+      - TEST_ENV=dev
+      - DB_HOST=mysql-container
+      - DB_PORT=3306
+      - DB_NAME=java_hr_db
+      - DB_USER=root
+      - DB_PASSWORD=57575han
+    depends_on:
+      - mysql-container       # MySQL이 먼저 시작되도록 설정
+    networks:
+      - app-network
+
+  mysql-container:
+    image: mysql:8.0          # MySQL 버전에 맞는 이미지 선택
+    container_name: mysql-db306-container
+    environment:
+      MYSQL_ROOT_PASSWORD: 57575han
+      MYSQL_DATABASE: java_hr_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 57575han
+    ports:
+      - "3306:3306"           # 호스트와 MySQL 컨테이너의 포트를 매핑
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+volumes:
+  mysql-data:
+
+networks:
+  app-network:
+    driver: bridge

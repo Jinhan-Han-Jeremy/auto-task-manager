@@ -1,0 +1,207 @@
+openapi: 3.0.0
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/JEREMYHANDATA/jinhanHan/1.0.0
+
+info:
+  description: This is a simple API
+  version: "1.0.0"
+  title: hr auto assign api
+  contact:
+    email: jeremy.han.data@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+tags:
+  - name: admins
+    description: Secured Admin-only calls
+  - name: developers
+    description: Operations available to regular developers
+
+paths:
+  /taskhistory:
+    get:
+      tags:
+        - developers
+      summary: Searches task history
+      operationId: searchTaskHistory
+      description: |
+        You can search for task history entries.
+        Additional search parameters can also be used to filter the search results.
+      parameters:
+        - in: query
+          name: searchString
+          description: Optionally pass a search string for looking up task history records
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: Number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: Maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses:
+        '200':
+          description: Task history matching the search criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskHistory'
+        '400':
+          description: Bad input parameter
+        '404':
+          description: Task history not found
+    post:
+      tags:
+        - admins
+      summary: Adds a task history entry
+      operationId: addTaskHistory
+      description: Adds a new task history entry to the system
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskHistory'
+        description: Task history data to be added
+        required: true
+      responses:
+        '201':
+          description: Task history entry created
+        '400':
+          description: Invalid input, object is invalid
+        '409':
+          description: A task history entry with the same ID already exists
+
+components:
+  schemas:
+##task
+    Task:
+      type: object
+      required:
+        - id
+        - name
+        - employees
+        - difficulty
+        - requirements
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "일정과 예산 계획 수립 초기"
+        employees:
+          type: string
+          example: "ProjectManager, ProductManager"
+        difficulty:
+          type: integer
+          example: 3
+        requirements:
+          type: string
+          example: "프로젝트 목표와 범위 설정 초기"
+##taskhistory
+    TaskHistory:
+      type: object
+      required:
+        - id
+        - name
+        - teammembers
+        - available_jobs
+        - spending_days
+        - state
+        - requirements_satisfied
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "프로젝트 목표와 범위 설정 초기"
+        teammembers:
+          type: string
+          example: "최프로, 이덕마, 이비례"
+        available_jobs:
+          type: string
+          example: "ProjectManager, BusinessOperator"
+        spending_days:
+          type: integer
+          example: 5
+        state:
+          type: string
+          example: "done"
+        requirements_satisfied:
+          type: boolean
+          example: true
+##teammember
+    TeamMember:
+      type: object
+      required:
+        - id
+        - name
+        - role
+        - level
+        - state
+        - performance_for_skills
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "이프로"
+        role:
+          type: string
+          example: "ProjectManager"
+        level:
+          type: integer
+          example: 3
+        state:
+          type: boolean
+          example: true
+        performance_for_skills:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            Java: 8
+            Python: 6
+##workstream info
+    WorkStreamInfo:
+      type: object
+      required:
+        - id
+        - workstream
+        - available_jobs
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        workstream:
+          type: string
+          example: "회사는 새로운 소프트웨어 개발 프로젝트를 시작하며, 프로젝트 목표와 범위 설정으로 명확한 목표와 작업 범위를 정의한 뒤, 일정과 예산 계획 수립을 통해 필요한 자원과 시간을 산정합니다. 이어 팀 구성 및 역할 할당으로 인력을 배치하고, 프로젝트 킥오프 미팅에서 모든 계획을 공유하여 프로젝트를 본격적으로 시작합니다."
+        available_jobs:
+          type: string
+          example: "Projectmanager, Productmanager, BusinessOperator"
+    Schema:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
